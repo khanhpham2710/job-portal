@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/apply-data
+    username: postgres
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+application:
+  security:
+    jwt:
+      public-paths:
+        - /actuator/health
+        - /api/auth/**
+      access:
+        secret: ${JWT_ACCESS_SECRET:ZGV2LWFjY2Vzcy1zZWNyZXQta2V5LWNoYW5nZS1tZS0wMTIzNDU2Nzg5}
+        expiration: 10m
+        issuer: job-portal
+  refresh:
+    token:
+      secret: ${JWT_REFRESH_SECRET:ZGV2LXJlZnJlc2gtc2VjcmV0LWtleS1jaGFuZ2UtbWUtOTg3NjU0MzIx}
+      expiration: 7d
+      issuer: job-portal

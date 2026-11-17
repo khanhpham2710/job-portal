@@ -1,0 +1,12 @@
+server:
+  port: 5001
+application:
+  security:
+    jwt:
+      public-paths:
+        - /actuator/health
+        - /api/auth/**
+      access:
+        secret: ${JWT_ACCESS_SECRET:ZGV2LWFjY2Vzcy1zZWNyZXQta2V5LWNoYW5nZS1tZS0wMTIzNDU2Nzg5}
+        expiration: 10m
+        issuer: job-portal

@@ -1,0 +1,35 @@
+#!/bin/sh
+# pre-commit: format code bằng Spotless, rồi stage lại các file Java đã được staged.
+# Bỏ qua khi cần: git commit --no-verify
+
+ROOT=$(git rev-parse --show-toplevel)
+POM="$ROOT/backend/pom.xml"
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.java$')
+[ -z "$STAGED" ] && exit 0
+
+# Nếu file đang stage một phần (còn thay đổi chưa stage), chặn để khỏi vô tình stage thêm.
+PARTIAL=""
+for f in $STAGED; do
+  if ! git diff --quiet -- "$f"; then
+    PARTIAL="$PARTIAL\n  $f"
+  fi
+done
+if [ -n "$PARTIAL" ]; then
+  printf "pre-commit: các file sau còn thay đổi chưa stage, hãy stage hết hoặc stash trước:%b\n" "$PARTIAL"
+  exit 1
+fi
+
+echo "pre-commit: chạy spotless:apply ..."
+if ! mvn -q -f "$POM" spotless:apply; then
+  echo "pre-commit: spotless:apply lỗi, commit bị huỷ."
+  exit 1
+fi
+
+# Stage lại đúng những file đã staged (đã được format)
+echo "$STAGED" | while IFS= read -r f; do
+  [ -f "$f" ] && git add -- "$f"
+done
+
+echo "pre-commit: OK"
+exit 0

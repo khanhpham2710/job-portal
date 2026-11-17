@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: company-service
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/company-data
+    username: postgres
+    password: Bin@2710
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+server:
+  port: 5002

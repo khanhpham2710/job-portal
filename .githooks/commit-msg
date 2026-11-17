@@ -1,0 +1,31 @@
+#!/bin/sh
+# commit-msg: kiểm tra Conventional Commits.
+# Ví dụ hợp lệ:  feat(user-service): add login endpoint
+#                fix: handle null email
+#                refactor(common)!: rename JwtAuthenticator
+
+MSG_FILE="$1"
+FIRST_LINE=$(head -n 1 "$MSG_FILE")
+
+# Bỏ qua merge, revert, fixup/squash do git tự sinh
+case "$FIRST_LINE" in
+  Merge\ *|Revert\ *|fixup!\ *|squash!\ *) exit 0 ;;
+esac
+
+PATTERN='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._-]+\))?!?: .{1,72}$'
+
+if ! echo "$FIRST_LINE" | grep -Eq "$PATTERN"; then
+  cat <<MSG
+commit-msg: message không đúng chuẩn Conventional Commits.
+
+  Dạng:  <type>(<scope>)?: <mô tả ngắn, tối đa 72 ký tự>
+  type:  feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+  Ví dụ: feat(user-service): add login endpoint
+         fix: handle null email
+         refactor(common): rename JwtAuthenticator
+
+  Message của bạn: "$FIRST_LINE"
+MSG
+  exit 1
+fi
+exit 0
